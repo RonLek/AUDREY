@@ -1,6 +1,6 @@
 # Audrey: UMass Dining Assistant
 
-![Audrey]("audrey-banner.png")
+![Audrey](audrey-banner.png)
 
 This project is built as a part of Hack(H)er413 at UMass Amherst.
 
@@ -46,4 +46,7 @@ Data will need to be fetched periodically until an async cron job is designed. M
 curl http://localhost:5000/data?dining=worcester
 ```
 
+<h5 align="center">
+
 Made with ❤️ by Rohan Lekhwani
+</h5>
