@@ -59,7 +59,7 @@ const App = () => {
       .then(res => {
         console.log(res);
         console.log(res.data);
-        setMessages([...messages, inputMessage, res.data.split("\n")]);
+        setMessages([...messages, inputMessage, res.data]);
         setLoading(false);
       })
       setInputMessage("");
