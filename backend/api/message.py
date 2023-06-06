@@ -20,7 +20,7 @@ class MessageApiHandler(Resource):
     # load the data based on dining hall
     recipes = load_data(args["message"])
 
-    if intent == 'poem':
+    if intent == 'poem' and 'tofu' in args["message"].lower():
       return "Soft and silky, white as snow,\nTofu sits on my plate just so.\nA protein-packed, healthy delight,\nTofu makes my taste buds take flight.\nFried or sautéed, in soup or stew,\nTofu adds flavor, through and through."
     
     elif intent == 'filter':
@@ -33,7 +33,7 @@ class MessageApiHandler(Resource):
       recipe_names = get_recipe_names(recipes)
       return generate_response(args["message"], recipe_names)
     
-    elif intent == "chitchat":
+    elif intent == "chitchat" or intent == "poem":
       return generate_chitchat_response(args["message"])
     
     else:
