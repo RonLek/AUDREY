@@ -97,46 +97,50 @@ def filter_recipes(recipes, query):
     final_recipes = []
     for recipe in recipes:
         if int(recipe['calories']) <= int(calories) and int(recipe['healthfulness']) >= int(healthfulness) and recipe['carbon'] >= carbon:
-            if len(allergens) != 0 or len(ingredients) != 0:
-                for allergen in allergens:
-                    if allergen not in recipe['allergens']:
-                        if len(ingredients) != 0:
-                            for ingredient in ingredients:
-                                if ingredient in recipe['ingredients']:
-                                    final_recipes.append(recipe)
-            else:
-                final_recipes.append(recipe)
+            final_recipes.append(recipe)
     
+    if len(ingredients) > 0:
+        final_recipes = [recipe for recipe in final_recipes for ingredient in ingredients if ingredient in recipe['ingredients']]
+    
+    if len(allergens) > 0:
+        final_recipes = [recipe for recipe in final_recipes for allergen in allergens if allergen not in recipe['allergens']]
+
+    print("final recipes length = ", len(final_recipes))
     return final_recipes 
 
 def generate_response(query, recipes):
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    response = openai.Completion.create(
-    model="text-davinci-003",
-    prompt=f"{recipes}\n {query}. Generate friendly response as a part of a conversation. Maximum recipes = 5.",
-    temperature=0.5,
-    max_tokens=500,
-    top_p=1.0,
-    frequency_penalty=0.8,
-    presence_penalty=0.0
+    response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages = [{
+        "role": "system",
+        "content": f"I am Audrey, the dining assistant for UMass dining. I take recipe data and user's query and generate friendly response as a part of a conversation to suggest user dishes they can have based on their preferences, cuisine, course and mood. I don't combine multiple recipes into one. I don't ask users any questions. If user doesn't explicitly mention what they're looking for, I try my best to satisfy the user's query from among the recipes given to me only. I limit the number suggestions to a maximum of 5 best suggestions and a minimum of 1 suggestion."
+    },
+    {
+        "role": "user",
+        "content": f"{recipes}\n {query}."
+    }
+    ]
     )
 
-    print("generated response = ", response["choices"][0]["text"].strip())
-    return response["choices"][0]["text"].strip()
+    print("generated response = ", response["choices"][0]["message"]["content"].strip())
+    return response["choices"][0]["message"]["content"].strip()
 
 def generate_chitchat_response(query):
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    response = openai.Completion.create(
-    model="text-davinci-003",
-    prompt=f"You are Audrey, chatbot assistant for UMass dining. You are a female black girl aged 10. Respond to the conversation: {query}",
-    temperature=0.5,
-    max_tokens=500,
-    top_p=1.0,
-    frequency_penalty=0.8,
-    presence_penalty=0.0
+    response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages = [{
+        "role": "system",
+        "content": f"You are Audrey, chatbot assistant for UMass dining. You are a black girl aged 10. You like chocolates and tofu. You chitchat with the user without asking the user any questions. You don't share any personal information. You maintain your character in your answers." 
+    },
+    {
+        "role": "user",
+        "content": f"{query}"
+        }]
     )
 
-    print("generated response = ", response["choices"][0]["text"].strip())
-    return response["choices"][0]["text"].strip()
+    print("generated response = ", response["choices"][0]["message"]["content"].strip())
+    return response["choices"][0]["message"]["content"].strip()
